@@ -47,6 +47,10 @@ include "includes/stdlib.pxi"
 
 include "errors.pyx"
 
+cdef extern from "includes/compat.h" nogil:
+
+    int cf_uv_run(uv.uv_loop_t *loop, uv.uv_run_mode mode)
+
 cdef:
     int PY39 = PY_VERSION_HEX >= 0x03090000
     int PY311 = PY_VERSION_HEX >= 0x030b0000
@@ -504,7 +508,7 @@ cdef class Loop:
         # manual refs management.
         Py_INCREF(self)
         with nogil:
-            err = uv.uv_run(self.uvloop, mode)
+            err = cf_uv_run(self.uvloop, mode)
         Py_DECREF(self)
 
         if err < 0:
